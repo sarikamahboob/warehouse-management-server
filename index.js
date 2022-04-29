@@ -19,6 +19,7 @@ async function run() {
   try {
     await client.connect();
     const productCollection = client.db("eWarehouse").collection("products");
+    const orderCollection = client.db("eWarehouse").collection("orders");
 
     app.get("/inventory", async (req, res) => {
       const query = req.query;
@@ -51,6 +52,25 @@ async function run() {
         options
       );
       res.send(result);
+    });
+
+    app.post("/inventory", async (req, res) => {
+      const newProduct = req.body;
+      const result = await productCollection.insertOne(newProduct);
+      res.send(result);
+    });
+
+    app.post("/orders", async (req, res) => {
+      const addOrder = req.body;
+      const result = await orderCollection.insertOne(addOrder);
+      res.send(result);
+    });
+
+    app.get("/orderList", async (req, res) => {
+      const query = req.query;
+      const cursor = orderCollection.find(query);
+      const products = await cursor.toArray();
+      res.send(products);
     });
   } finally {
   }
